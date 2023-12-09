@@ -1,0 +1,19 @@
+chainlit
+langchain
+nltk
+spacy
+pandas
+scikit-learn
+duckduckgo-search
+numexpr
+arxiv
+wikipedia
+llama_index
+sentence-transformers
+requests
+gradio
+fastapi
+pyngrok
+openai
+httpx
+#pip install -r requirements.txt
