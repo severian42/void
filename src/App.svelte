@@ -10,27 +10,13 @@
   import { chatsStorage, setGlobalSettingValueByKey } from './lib/Storage.svelte'
   import { Modals, closeModal } from 'svelte-modals'
   import { dispatchModalEsc, checkModalEsc } from './lib/Util.svelte'
-  import { set as setOpenAI } from './lib/providers/openai/util.svelte'
   import { hasActiveModels } from './lib/Models.svelte'
-
-  // Check if the API key is passed in as a "key" query parameter - if so, save it
-  // Example: https://niek.github.io/chatgpt-web/#/?key=sk-...
-  const urlParams: URLSearchParams = new URLSearchParams($querystring)
-  if (urlParams.has('petals')) {
-    console.log('enablePetals')
-    setGlobalSettingValueByKey('enablePetals', true)
-  }
 
   // The definition of the routes with some conditions
   const routes = {
     '/': Home,
 
-    '/chat/new': wrap({
-      component: NewChat,
-      conditions: () => {
-        return hasActiveModels()
-      }
-    }),
+    '/chat/new': NewChat,
 
     '/chat/:chatId': wrap({
       component: Chat,
@@ -56,9 +42,9 @@
   <Sidebar />
 </div>
 <div class="main-content-column" id="content">
-  {#key $location}
+
     <Router {routes} on:conditionsFailed={() => replace('/')}/>
-  {/key}
+
 </div>
 
 <Modals>
