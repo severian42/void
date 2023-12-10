@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { globalStorage, lastChatId, getChat, started, /* setGlobalSettingValueByKey, */checkStateChange } from './Storage.svelte'
+  import { apiKeyStorage, globalStorage, lastChatId, getChat, started, /* setGlobalSettingValueByKey, */checkStateChange } from './Storage.svelte'
   import Footer from './Footer.svelte'
   import { replace } from 'svelte-spa-router'
   import { afterUpdate, onMount } from 'svelte'
@@ -7,6 +7,7 @@
   import { set as setOpenAI } from './providers/openai/util.svelte'
   import { hasActiveModels } from './Models.svelte'
 
+$: apiKey = $apiKeyStorage
 
 // let showPetalsSettings = $globalStorage.enablePetals
 let pedalsEndpoint = $globalStorage.pedalsEndpoint
@@ -44,12 +45,26 @@ afterUpdate(() => {
   <article class="message">
     <div class="message-body">
     <p class="mb-4">
-      <strong>ANIMA Nexus</strong> is an AI assistant that was instructed to help scientists and engineers understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies.
+      <strong>BIDARA</strong> is a GPT-4 chatbot that was instructed to help scientists and engineers understand, learn from, and emulate the strategies used by living things to create sustainable designs and technologies.
     </p>
     <p class="mb-4">
-      ANIMA can guide users through the Biomimicry Institute’s Design Process, a step-by-step method to propose biomimetic solutions to challenges. This process includes defining the problem, biologizing the challenge, discovering natural models, abstracting design strategies, and emulating nature's lessons.
+      BIDARA can guide users through the Biomimicry Institute’s Design Process, a step-by-step method to propose biomimetic solutions to challenges. This process includes defining the problem, biologizing the challenge, discovering natural models, abstracting design strategies, and emulating nature's lessons.
     </p>
-
+    <p class="mb-4">
+      To use BIDARA, you need to register for
+      <a href="https://platform.openai.com/account/api-keys" target="_blank" rel="noreferrer">an OpenAI API key</a>
+      first. OpenAI bills per token (usage-based), which means it is a lot cheaper than
+      <a href="https://openai.com/blog/chatgpt-plus" target="_blank" rel="noreferrer">ChatGPT Plus</a>, unless you use
+      more than 10 million tokens per month. All messages are stored in your browser's local storage, so everything is
+      <strong>private</strong>. You can also close the browser tab and come back later to continue the conversation.
+    </p>
+    <p>
+      <strong>WARNING</strong>
+    </p>
+    <ul class="mb-4"><li>- Do not share any sensitive information in your conversations including but not limited to, personal information, sensitive or non-public government/company data, ITAR, CUI, export controlled, or trade secrets.</li>
+    <li>- While OpenAI has safeguards in place, BIDARA may occasionally generate incorrect or misleading information and produce offensive or biased content.</li>
+    <li>- The chatbot may produce inaccurate information about people, places, or facts.</li>
+    </ul>
     <!---
     <p>
       As an alternative to OpenAI, you can also use Petals swarm as a free API option for open chat models like Llama 2. 
@@ -57,10 +72,45 @@ afterUpdate(() => {
     --->
     </div>
   </article>
-  <article class="message" class:is-danger={!hasModels}>
+  <article class="message" class:is-danger={!hasModels} class:is-warning={!apiKey} class:is-info={apiKey}>
     <div class="message-body">
-      Welcome to ANIMA Nexus!
+      Set your OpenAI API key below:
 
+      <form
+        class="field has-addons has-addons-right"
+        on:submit|preventDefault={(event) => {
+          let val = ''
+          if (event.target && event.target[0].value) {
+            val = (event.target[0].value).trim()
+          }
+          setOpenAI({ apiKey: val })
+          hasModels = hasActiveModels()
+        }}
+      >
+        <p class="control is-expanded">
+          <input
+            aria-label="OpenAI API key"
+            type="password"
+            autocomplete="off"
+            class="input"
+            class:is-danger={!hasModels}
+            class:is-warning={!apiKey} class:is-info={apiKey}
+            value={apiKey}
+          />
+        </p>
+        <p class="control">
+          <button class="button is-info" type="submit">Save</button>
+        </p>
+
+
+      </form>
+
+      {#if !apiKey}
+        <p class:is-danger={!hasModels} class:is-warning={!apiKey}>
+          Please enter your <a target="_blank" href="https://platform.openai.com/account/api-keys">OpenAI API key</a> above to use Open AI's ChatGPT API.
+          At least one API must be enabled to use BIDARA.
+        </p>
+      {/if}
     </div>
   </article>
 
@@ -129,13 +179,13 @@ afterUpdate(() => {
     </div>
   </article>
   --->
-
+  {#if apiKey}
     <article class="message is-info">
       <div class="message-body">
         Select an existing chat on the sidebar, or
         <a href={'#/chat/new'}>create a new chat</a>
       </div>
     </article>
-
+  {/if}
 </section>
 <Footer pin={true} />
